@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusVR - Immersive Virtual Reality Experiences</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --primary: #5e35b1;
+            --secondary: #3949ab;
+            --accent: #7c4dff;
+            --dark: #1a237e;
+            --light: #e8eaf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vr-headset {
+            width: 500px;
+            height: 300px;
+            position: relative;
+            margin-bottom: 50px;
+        }
+
+        .vr-headset img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--accent), var(--light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            color: #ccc;
+        }
+
+        .cta-button {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(94, 53, 177, 0.3);
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        section {
+            padding: 100px 0;
+            background: linear-gradient(180deg, #000, #111);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .vr-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .vr-card {
+            background: rgba(30, 30, 40, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.5s, box-shadow 0.5s;
+            position: relative;
+            height: 450px;
+        }
+
+        .vr-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(94, 53, 177, 0.2);
+        }
+
+        .card-image {
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .vr-card:hover .card-image img {
+            transform: scale(1.1);
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+
+        .card-content p {
+            color: #aaa;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .card-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            background: rgba(124, 77, 255, 0.2);
+            color: var(--accent);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 30px;
+            background: rgba(30, 30, 40, 0.5);
+            border-radius: 15px;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(124, 77, 255, 0.1);
+            border-radius: 50%;
+            font-size: 30px;
+            color: var(--accent);
+        }
+
+        .feature h3 {
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .feature p {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .testimonials {
+            background: #000;
+            position: relative;
+        }
+
+        .testimonial-slider {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 30px;
+            padding: 20px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .testimonial {
+            flex: 0 0 350px;
+            scroll-snap-align: start;
+            background: rgba(30, 30, 40, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .testimonial-content {
+            position: relative;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #ccc;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+
+        .author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .author-info h4 {
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .author-info p {
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+
+        footer {
+            background: #111;
+            padding: 50px 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(124, 77, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #aaa;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-icon:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            color: #555;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .vr-headset {
+                width: 80%;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .testimonial {
+                flex: 0 0 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">NexusVR</div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#experiences">Experiences</a>
+            <a href="#testimonials">Testimonials</a>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="particles"></div>
+        <div class="vr-headset">
+            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e518d9de-9a02-405b-96f5-077cd3e49280.png" alt="Futuristic VR headset with glowing blue accents floating in dark space" />
+        </div>
+        <div class="hero-content">
+            <h1>Step Into The Future</h1>
+            <p>Experience the most immersive virtual reality with our cutting-edge technology and endless possibilities.</p>
+            <button class="cta-button">Get Started</button>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose Nexus VR?</h2>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🕶️</div>
+                    <h3>Immersive Experience</h3>
+                    <p>Our ultra-high resolution displays and advanced optics transport you to other worlds with stunning clarity.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎮</div>
+                    <h3>Intuitive Controls</h3>
+                    <p>Natural hand tracking and gesture recognition make interactions feel completely intuitive and realistic.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Expanding Universe</h3>
+                    <p>Access a growing library of experiences, games, and social spaces that keep expanding monthly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experiences">
+        <div class="container">
+            <h2 class="section-title">Featured Experiences</h2>
+            <div class="vr-cards">
+                <div class="vr-card">
+                    <div class="card-image">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a79546f7-2fc5-42ba-8b26-24c5111e558f.png" alt="VR space exploration game with colorful nebulas and distant galaxies" />
+                    </div>
+                    <div class="card-content">
+                        <h3>Stellar Odyssey</h3>
+                        <p>Explore distant galaxies and unravel cosmic mysteries in this breathtaking space adventure.</p>
+                        <span class="card-tag">Adventure</span>
+                        <span class="card-tag">Sci-Fi</span>
+                    </div>
+                </div>
+                <div class="vr-card">
+                    <div class="card-image">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/dd1386fa-f822-4a07-a7d0-3932de311956.png" alt="VR art studio with floating digital brushes painting in mid-air" />
+                    </div>
+                    <div class="card-content">
+                        <h3>Creative Universe</h3>
+                        <p>Express yourself in limitless dimensions with our revolutionary VR art tools.</p>
+                        <span class="card-tag">Creative</span>
+                        <span class="card-tag">Productivity</span>
+                    </div>
+                </div>
+                <div class="vr-card">
+                    <div class="card-image">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cf9197e8-a2bb-452d-b759-d49f552f51fc.png" alt="Multiplayer VR party game with cartoon avatars celebrating together" />
+                    </div>
+                    <div class="card-content">
+                        <h3>Social Nexus</h3>
+                        <p>Connect with friends around the world in vibrant virtual social spaces and events.</p>
+                        <span class="card-tag">Social</span>
+                        <span class="card-tag">Party</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Our Users Say</h2>
+            <div class="testimonial-slider">
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        "NexusVR completely changed my perspective on entertainment. The immersion is unlike anything I've ever experienced."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/2733f465-c164-4ff0-b4b7-c330637c8f56.png" alt="Portrait of a tech enthusiast smiling while wearing VR glasses" />
+                        </div>
+                        <div class="author-info">
+                            <h4>Alex Johnson</h4>
+                            <p>Tech Reviewer</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        "As an educator, I've found NexusVR to be transformative for my students. They engage with material in entirely new ways."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e4c5ad8e-8717-4a8e-9f5b-64d27f5b1ebc.png" alt="Professional educator portrait with glasses in a classroom setup" />
+                        </div>
+                        <div class="author-info">
+                            <h4>Dr. Sarah Chen</h4>
+                            <p>Educator</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        "The quality and comfort are unmatched. I can wear it for hours without discomfort, which is crucial for my design work."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/36d1a3dd-7496-4bf2-adfb-aa57f313b6cb.png" alt="Creative designer working on digital art in a studio environment" />
+                        </div>
+                        <div class="author-info">
+                            <h4>Miguel Torres</h4>
+                            <p>3D Artist</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Support</a>
+                <a href="#">Developers</a>
+                <a href="#">Careers</a>
+                <a href="#">Privacy</a>
+            </div>
+            <div class="social-icons">
+                <a href="#" class="social-icon">FB</a>
+                <a href="#" class="social-icon">IG</a>
+                <a href="#" class="social-icon">TW</a>
+                <a href="#" class="social-icon">YT</a>
+            </div>
+            <p class="copyright">© 2023 NexusVR. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero animation
+        gsap.from(".vr-headset", {
+            duration: 1.5,
+            y: 100,
+            opacity: 0,
+            ease: "power3.out"
+        });
+
+        gsap.from(".hero h1", {
+            duration: 1,
+            y: 50,
+            opacity: 0,
+            delay: 0.5,
+            ease: "power3.out"
+        });
+
+        gsap.from(".hero p", {
+            duration: 1,
+            y: 50,
+            opacity: 0,
+            delay: 0.8,
+            ease: "power3.out"
+        });
+
+        gsap.from(".cta-button", {
+            duration: 1,
+            y: 50,
+            opacity: 0,
+            delay: 1.1,
+            ease: "power3.out"
+        });
+
+        // Particle effect for hero section
+        const particles = document.querySelector('.particles');
+        for (let i = 0; i < 100; i++) {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = `${Math.random() * 5 + 1}px`;
+            particle.style.height = particle.style.width;
+            particle.style.backgroundColor = `hsla(${Math.random() * 60 + 250}, 100%, 70%, ${Math.random() * 0.5 + 0.2})`;
+            particle.style.borderRadius = '50%';
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            
+            gsap.to(particle, {
+                duration: Math.random() * 10 + 5,
+                x: `${Math.random() * 100 - 50}px`,
+                y: `${Math.random() * 100 - 50}px`,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+            
+            particles.appendChild(particle);
+        }
+
+        // Scroll animations for sections
+        gsap.utils.toArray('section').forEach(section => {
+            gsap.from(section, {
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+
+        // VR Cards animations
+        gsap.utils.toArray('.vr-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                delay: i * 0.1,
+                ease: "power3.out"
+            });
+            
+            card.addEventListener('mouseenter', () => {
+                gsap.to(card, {
+                    scale: 1.02,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+        });
+
+        // Features animations
+        gsap.utils.toArray('.feature').forEach((feature, i) => {
+            gsap.from(feature, {
+                scrollTrigger: {
+                    trigger: feature,
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                delay: i * 0.1,
+                ease: "power3.out"
+            });
+            
+            gsap.from(feature.querySelector('.feature-icon'), {
+                scrollTrigger: {
+                    trigger: feature,
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                },
+                scale: 0,
+                rotation: 180,
+                duration: 0.8,
+                delay: i * 0.1,
+                ease: "back.out(1.7)"
+            });
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                gsap.to(window, {
+                    duration: 1,
+                    scrollTo: this.getAttribute('href'),
+                    ease: "power3.inOut"
+                });
+            });
+        });
+
+        // Testimonials slider animation
+        const testimonials = document.querySelector('.testimonial-slider');
+        gsap.from(testimonials, {
+            scrollTrigger: {
+                trigger: testimonials,
+                start: "top 80%",
+                toggleActions: "play none none none"
+            },
+            x: 100,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out"
+        });
+    </script>
+</body>
+</html>
